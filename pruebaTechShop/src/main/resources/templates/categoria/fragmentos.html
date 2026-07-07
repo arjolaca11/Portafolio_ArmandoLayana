@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <body>
+        <!-- fragmento 1 para Agregar categoria en ventana modal -->
+        <section th:fragment="agregar" class="row py-4 mb-2">
+            <div class="col-md-1"></div>
+            <div class="col-md-3">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agregarCategoriaModal">
+                    <i class="fa-solid fa-plus"></i> [[#{categoria.agregar}]]
+                </button>
+            </div>
+
+            <div class="modal fade" id="agregarCategoriaModal" tabindex="-1" aria-labelledby="agregarCategoriaLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-info text-white">
+                            <h1 class="modal-title fs-5" id="agregarCategoriaLabel">[[#{categoria.agregar}]]</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form th:action="@{/categoria/guardar}" th:object="${categoria}" class="was-validated" method="post">
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label>[[#{categoria.descripcion}]]</label>
+                                    <input type="text" th:field="*{descripcion}" class="form-control" required="true"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label>[[#{categoria.rutaImagen}]]</label>
+                                    <input type="text" th:field="*{rutaImagen}" class="form-control"/>
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" th:field="*{activo}" class="form-check-input"/>
+                                    <label class="form-check-label">[[#{categoria.activo}]]</label>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i> [[#{accion.cerrar}]]</button>
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> [[#{accion.guardar}]]</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- fragmento 2 para el listado de categorias -->
+        <section th:fragment="listado" class="p-3">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">[[#{categoria.listado}]]</div>
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>[[#{categoria.descripcion}]]</th>
+                                        <th>[[#{categoria.imagen}]]</th>
+                                        <th>[[#{categoria.activo}]]</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="cat, iter : ${categorias}">
+                                        <td th:text="${iter.count}"></td>
+                                        <td th:text="${cat.descripcion}"></td>
+                                        <td><img th:if="${cat.rutaImagen}" th:src="${cat.rutaImagen}" height="80" alt=""/></td>
+                                        <td th:text="${cat.activo} ? #{categoria.activa} : #{categoria.inactiva}"></td>
+                                        <td class="text-nowrap">
+                                            <a class="btn btn-danger btn-sm" th:href="@{/categoria/eliminar/{id}(id=${cat.idCategoria})}"
+                                               onclick="return confirm('¿Eliminar esta categoria?');">
+                                                <i class="fa-solid fa-trash"></i> [[#{accion.eliminar}]]
+                                            </a>
+                                            <a class="btn btn-warning btn-sm" th:href="@{/categoria/modificar/{id}(id=${cat.idCategoria})}">
+                                                <i class="fa-solid fa-pen"></i> [[#{accion.actualizar}]]
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-success text-white text-center p-3">
+                        <h5>[[#{categoria.total}]]</h5>
+                        <h2><i class="fa-solid fa-layer-group"></i> [[${totalCategorias}]]</h2>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- fragmento 3 que se utiliza en la pagina modificar.html -->
+        <section th:fragment="editar" class="p-3">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">[[#{categoria.modificar}]]</div>
+                        <div class="card-body">
+                            <form th:action="@{/categoria/modificar}" th:object="${categoria}" method="post">
+                                <input type="hidden" th:field="*{idCategoria}"/>
+                                <div class="mb-3">
+                                    <label>[[#{categoria.descripcion}]]</label>
+                                    <input type="text" th:field="*{descripcion}" class="form-control" required="true"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label>[[#{categoria.rutaImagen}]]</label>
+                                    <input type="text" th:field="*{rutaImagen}" class="form-control"/>
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" th:field="*{activo}" class="form-check-input"/>
+                                    <label class="form-check-label">[[#{categoria.activo}]]</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> [[#{accion.guardar}]]</button>
+                                <a th:href="@{/categoria/listado}" class="btn btn-secondary"><i class="fa-solid fa-xmark"></i> [[#{accion.cerrar}]]</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>

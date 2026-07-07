@@ -69,7 +69,7 @@ public class ProjectConfig implements WebMvcConfigurer {
     // registra el interceptor de idioma
     @Override
     public void addInterceptors(InterceptorRegistry registro) {
-        registro.addInterceptor(localeChangeInterceptor());
+      registro.addInterceptor(localeChangeInterceptor());
     }
 
     // permite leer los messages*.properties desde Thymeleaf con [[#{clave}]]
