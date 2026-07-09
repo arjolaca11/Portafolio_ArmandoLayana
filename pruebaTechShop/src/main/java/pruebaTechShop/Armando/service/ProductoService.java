@@ -51,6 +51,27 @@ public class ProductoService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public List<Producto> consultaDerivada(double precioInf, double precioSup) {
+        return productoRepository.findByPrecioBetweenOrderByPrecioAsc(precioInf, precioSup);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Producto> consultaJPQL(double precioInf, double precioSup) {
+        return productoRepository.consultaJPQL(precioInf, precioSup);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Producto> consultaSQL(double precioInf, double precioSup) {
+        return productoRepository.consultaSQL(precioInf, precioSup);
+    }
+
+    // Reto sem08: consulta propia
+    @Transactional(readOnly = true)
+    public List<Producto> buscarPorDescripcion(String texto) {
+        return productoRepository.findByDescripcionContainingIgnoreCase(texto);
+    }
+
     @Transactional
     public void delete(Integer idProducto) {
         // Verifica si el producto existe antes de intentar eliminarlo

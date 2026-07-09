@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
     <body>
-        <!-- fragmento 1 para Agregar producto en ventana modal -->
-        <section th:fragment="agregar" class="row py-4 mb-2">
+        <!-- fragmento 1 para Agregar producto en ventana modal (solo ADMIN) -->
+        <section th:fragment="agregar" class="row py-4 mb-2" sec:authorize="hasRole('ADMIN')">
             <div class="col-md-1"></div>
             <div class="col-md-3">
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agregarProductoModal">
@@ -90,7 +91,7 @@
                                         <td><img th:if="${prod.rutaImagen}" th:src="${prod.rutaImagen}" height="80" alt=""/></td>
                                         <td th:text="${prod.categoria.descripcion}"></td>
                                         <td th:text="${prod.activo} ? #{categoria.activa} : #{categoria.inactiva}"></td>
-                                        <td class="text-nowrap">
+                                        <td class="text-nowrap" sec:authorize="hasRole('ADMIN')">
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmModal"
                                                     th:attr="data-bs-id=${prod.idProducto}, data-bs-descripcion=${prod.descripcion}">
                                                 <i class="fa-solid fa-trash"></i> [[#{accion.eliminar}]]
@@ -164,8 +165,8 @@
             </div>
         </section>
 
-        <!-- fragmento 4 que define el modal de confirmacion para eliminar un producto -->
-        <section th:fragment="confirmarEliminar">
+        <!-- fragmento 4 que define el modal de confirmacion para eliminar un producto (solo ADMIN) -->
+        <section th:fragment="confirmarEliminar" sec:authorize="hasRole('ADMIN')">
             <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">

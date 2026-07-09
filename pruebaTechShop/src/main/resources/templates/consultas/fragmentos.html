@@ -59,5 +59,61 @@
                 </div>
             </div>
         </section>
+
+        <!-- fragmento 3: formulario reutilizable de consulta por rango de precio -->
+        <div th:fragment="formConsulta(colorForm, textoForm, urlForm)">
+            <form method="post" th:action="@{${urlForm}}" class="was-validated">
+                <div class="card p-2">
+                    <div class="card-header text-center text-white" th:classappend="${'bg-' + colorForm}">
+                        <h5>[[${textoForm}]]</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label>[[#{consultas.precioInferior}]]</label>
+                            <input type="number" name="precioInf" th:value="${precioInf}" class="form-control" min="0" step="0.01" required/>
+                        </div>
+                        <div class="mb-3">
+                            <label>[[#{consultas.precioSuperior}]]</label>
+                            <input type="number" name="precioSup" th:value="${precioSup}" class="form-control" min="0" step="0.01" required/>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <button type="submit" class="btn text-white" th:classappend="${'btn-' + colorForm}">
+                            <i class="fa-solid fa-magnifying-glass"></i> [[${textoForm}]]
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- fragmento 4: reto sem08, consulta propia (busqueda por texto en la descripcion) -->
+        <div th:fragment="formBuscar">
+            <form method="post" th:action="@{/consultas/buscar}" class="was-validated">
+                <div class="card p-2">
+                    <div class="card-header text-center text-white bg-dark">
+                        <h5>[[#{consultas.busqueda}]]</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label>[[#{consultas.textoBuscar}]]</label>
+                            <input type="text" name="texto" th:value="${texto}" class="form-control" maxlength="50" required/>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <button type="submit" class="btn btn-dark text-white">
+                            <i class="fa-solid fa-magnifying-glass"></i> [[#{consultas.busqueda}]]
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- fragmento 5: agrupa los 4 formularios de consulta (3 formas ensenadas + el reto propio) -->
+        <section th:fragment="consultas" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3 p-2">
+            <div th:replace="~{consultas/fragmentos :: formConsulta('primary', #{consultas.derivadas}, '/consultas/consultaDerivada')}"></div>
+            <div th:replace="~{consultas/fragmentos :: formConsulta('warning', #{consultas.jpql}, '/consultas/consultaJPQL')}"></div>
+            <div th:replace="~{consultas/fragmentos :: formConsulta('success', #{consultas.sql}, '/consultas/consultaSQL')}"></div>
+            <div th:replace="~{consultas/fragmentos :: formBuscar}"></div>
+        </section>
     </body>
 </html>

@@ -33,7 +33,11 @@ public class ProjectConfig implements WebMvcConfigurer {
         registry.addViewController("/multimedia").setViewName("multimedia");
         registry.addViewController("/iframes").setViewName("iframes");
         registry.addViewController("/login").setViewName("login");
+        // "/acceso_denegado" no se registra aqui: lo maneja SecurityViewController porque
+        // debe aceptar cualquier metodo HTTP (el AccessDeniedHandler hace un forward que
+        // conserva el metodo original, incluyendo POST).
         registry.addViewController("/registro/nuevo").setViewName("/registro/nuevo");
+        registry.addViewController("/registro/recordar").setViewName("/registro/recordar");
     }
 
     /* El siguiente método se utilizar para publicar en la nube, independientemente  */

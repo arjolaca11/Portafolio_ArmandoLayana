@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <!-- fragmentos reutilizables: las demas paginas hacen th:replace a head/header/footer -->
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
     <head th:fragment="head">
         <title>TechShop</title>
         <meta charset="UTF-8"/>
+        <!-- token CSRF de Spring Security; rutinas.js lo inyecta en todos los <form> de la pagina -->
+        <meta name="_csrf" th:content="${_csrf.token}"/>
+        <meta name="_csrf_parameter" th:content="${_csrf.parameterName}"/>
         <link th:href="@{/webjars/bootstrap/5.3.7/css/bootstrap.min.css}" rel="stylesheet"/>
         <link th:href="@{/webjars/font-awesome/7.0.0/css/all.css}" rel="stylesheet"/>
         <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
@@ -28,25 +32,56 @@
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
-                        <ul class="navbar-nav">
+                        <!-- solo visible para ADMIN o VENDEDOR: son las secciones de gestion de la tienda -->
+                        <ul class="navbar-nav" sec:authorize="hasRole('VENDEDOR') or hasRole('ADMIN')">
                             <li class="nav-item px-2"><a class="nav-link" th:href="@{/categoria/listado}">[[#{nav.categorias}]]</a></li>
                             <li class="nav-item px-2"><a class="nav-link" th:href="@{/producto/listado}">[[#{nav.productos}]]</a></li>
+                            <li class="nav-item px-2"><a class="nav-link" th:href="@{/consultas/listado}">[[#{nav.consultas}]]</a></li>
+                        </ul>
+                        <ul class="navbar-nav">
                             <li class="nav-item px-2"><a class="nav-link" th:href="@{/ejemplo2}">[[#{nav.autos}]]</a></li>
                             <li class="nav-item px-2"><a class="nav-link" th:href="@{/multimedia}">[[#{nav.multimedia}]]</a></li>
                             <li class="nav-item px-2"><a class="nav-link" th:href="@{/iframes}">[[#{nav.iframes}]]</a></li>
                         </ul>
-                        <!-- cada link manda ?lang=xx, lo captura localeChangeInterceptor en ProjectConfig.java -->
-                        <ul class="navbar-nav">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">[[#{nav.idioma}]]</a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" th:href="@{/(lang=es)}">Español</a></li>
-                                    <li><a class="dropdown-item" th:href="@{/(lang=en)}">English</a></li>
-                                    <li><a class="dropdown-item" th:href="@{/(lang=fr)}">Française</a></li>
-                                    <li><a class="dropdown-item" th:href="@{/(lang=pt)}">Portugaise</a></li>
-                                </ul>
-                            </li>
-                        </ul>
+                        <div class="d-flex align-items-center">
+                            <!-- cada link manda ?lang=xx, lo captura localeChangeInterceptor en ProjectConfig.java -->
+                            <ul class="navbar-nav">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">[[#{nav.idioma}]]</a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" th:href="@{/(lang=es)}">Español</a></li>
+                                        <li><a class="dropdown-item" th:href="@{/(lang=en)}">English</a></li>
+                                        <li><a class="dropdown-item" th:href="@{/(lang=fr)}">Française</a></li>
+                                        <li><a class="dropdown-item" th:href="@{/(lang=pt)}">Portugaise</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <!-- login / logout, segun el estado de autenticacion -->
+                            <ul class="navbar-nav" sec:authorize="!isAuthenticated()">
+                                <li class="nav-item px-2">
+                                    <a class="nav-link" th:href="@{/login}">
+                                        <i class="fa-solid fa-right-to-bracket"></i>
+                                        <span class="ms-1">[[#{login.login}]]</span>
+                                    </a>
+                                </li>
+                            </ul>
+                            <ul class="navbar-nav" sec:authorize="isAuthenticated()">
+                                <li class="nav-item px-2 my-auto">
+                                    <span class="nav-link">
+                                        <i class="fa-solid fa-user"></i>
+                                        <span sec:authentication="name" class="ms-1"></span>
+                                    </span>
+                                </li>
+                                <li class="nav-item px-2 my-auto">
+                                    <form method="post" th:action="@{/logout}">
+                                        <button class="btn nav-link" type="submit">
+                                            <i class="fa-solid fa-right-from-bracket"></i>
+                                            <span class="ms-1">[[#{login.logout}]]</span>
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </nav>

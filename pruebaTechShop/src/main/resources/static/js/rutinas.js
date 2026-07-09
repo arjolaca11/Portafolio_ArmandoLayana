@@ -29,6 +29,26 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+// Inyecta el token CSRF de Spring Security en todos los <form> de la pagina,
+// para no tener que repetir el <input hidden> en cada formulario POST.
+document.addEventListener('DOMContentLoaded', function () {
+    const tokenMeta = document.querySelector('meta[name="_csrf"]');
+    const paramMeta = document.querySelector('meta[name="_csrf_parameter"]');
+    if (!tokenMeta || !paramMeta) {
+        return;
+    }
+    document.querySelectorAll('form').forEach(function (form) {
+        if (form.querySelector('input[name="' + paramMeta.content + '"]')) {
+            return;
+        }
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = paramMeta.content;
+        input.value = tokenMeta.content;
+        form.appendChild(input);
+    });
+});
+
 //Para quitar toast
 setTimeout(() => {
     document.querySelectorAll('.toast').forEach(t => t.classList.remove('show'));

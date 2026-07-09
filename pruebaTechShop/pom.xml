@@ -110,6 +110,17 @@
 			<artifactId>firebase-admin</artifactId>
 			<version>9.7.0</version>
 		</dependency>
+
+		<!-- Spring Security: autenticacion, autorizacion y roles -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<!-- Permite usar sec:authorize / sec:authentication en las plantillas Thymeleaf -->
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
