@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Firebase (credenciales de la cuenta de servicio, nunca deben subirse a git) ###
+src/main/resources/firebase/*.json

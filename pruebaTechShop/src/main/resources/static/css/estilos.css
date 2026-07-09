@@ -14,6 +14,16 @@ section {
     padding: 15px;
 }
 
+/* Reto sem06: las tarjetas de producto "crecen" un poco al pasar el mouse */
+.producto-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.producto-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25) !important;
+}
+
 
 
 

@@ -1,12 +1,18 @@
 package pruebaTechShop.Armando.controller;
 
+import jakarta.validation.Valid;
+import java.util.Locale;
+import java.util.Optional;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pruebaTechShop.Armando.domain.Categoria;
 import pruebaTechShop.Armando.service.CategoriaService;
 
@@ -15,9 +21,11 @@ import pruebaTechShop.Armando.service.CategoriaService;
 public class CategoriaController {
 
     private final CategoriaService categoriaService;
+    private final MessageSource messageSource;
 
-    public CategoriaController(CategoriaService categoriaService) {
+    public CategoriaController(CategoriaService categoriaService, MessageSource messageSource) {
         this.categoriaService = categoriaService;
+        this.messageSource = messageSource;
     }
 
     @GetMapping("/listado")
@@ -30,26 +38,49 @@ public class CategoriaController {
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Categoria categoria) {
-        categoriaService.guardar(categoria);
+    public String guardar(@Valid Categoria categoria, @RequestParam MultipartFile imagenFile, RedirectAttributes redirectAttributes) {
+        categoriaService.save(categoria, imagenFile);
+        redirectAttributes.addFlashAttribute("todoOk", messageSource.getMessage("mensaje.actualizado", null, Locale.getDefault()));
+
         return "redirect:/categoria/listado";
     }
 
-    @GetMapping("/modificar/{id}")
-    public String modificar(@PathVariable("id") Integer idCategoria, Model model) {
-        model.addAttribute("categoria", categoriaService.getCategoria(idCategoria));
+    @PostMapping("/eliminar")
+    public String eliminar(@RequestParam Integer idCategoria, RedirectAttributes redirectAttributes) {
+        String titulo = "todoOk";
+        String detalle = "mensaje.eliminado";
+        try {
+            categoriaService.delete(idCategoria);
+        } catch (IllegalArgumentException e) {
+            titulo = "error"; // Captura la excepcion de argumento invalido para el mensaje de "no existe"
+            detalle = "categoria.error01";
+        } catch (IllegalStateException e) {
+            titulo = "error"; // Captura la excepcion de estado ilegal para el mensaje de "datos asociados"
+            detalle = "categoria.error02";
+        } catch (Exception e) {
+            titulo = "error";  // Captura cualquier otra excepcion inesperada
+            detalle = "categoria.error03";
+        }
+        redirectAttributes.addFlashAttribute(titulo, messageSource.getMessage(detalle, null, Locale.getDefault()));
+        return "redirect:/categoria/listado";
+    }
+
+    @GetMapping("/modificar/{idCategoria}")
+    public String modificar(@PathVariable("idCategoria") Integer idCategoria, Model model, RedirectAttributes redirectAttributes) {
+        Optional<Categoria> categoriaOpt = categoriaService.getCategoria(idCategoria);
+        if (categoriaOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", messageSource.getMessage("categoria.error01", null, Locale.getDefault()));
+            return "redirect:/categoria/listado";
+        }
+        model.addAttribute("categoria", categoriaOpt.get());
         return "categoria/modificar";
     }
 
     @PostMapping("/modificar")
-    public String actualizar(@ModelAttribute Categoria categoria) {
-        categoriaService.guardar(categoria);
-        return "redirect:/categoria/listado";
-    }
+    public String actualizar(@Valid Categoria categoria, @RequestParam MultipartFile imagenFile, RedirectAttributes redirectAttributes) {
+        categoriaService.save(categoria, imagenFile);
+        redirectAttributes.addFlashAttribute("todoOk", messageSource.getMessage("mensaje.actualizado", null, Locale.getDefault()));
 
-    @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable("id") Integer idCategoria) {
-        categoriaService.eliminar(idCategoria);
         return "redirect:/categoria/listado";
     }
 }

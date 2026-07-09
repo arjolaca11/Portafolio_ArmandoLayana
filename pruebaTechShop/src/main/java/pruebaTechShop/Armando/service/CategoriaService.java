@@ -1,8 +1,12 @@
 package pruebaTechShop.Armando.service;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import pruebaTechShop.Armando.domain.Categoria;
 import pruebaTechShop.Armando.repository.CategoriaRepository;
 
@@ -11,10 +15,12 @@ public class CategoriaService {
 
     // el repositorio es final para asegurar la inmutabilidad
     private final CategoriaRepository categoriaRepository;
+    private final FirebaseStorageService firebaseStorageService;
 
     // inyeccion por constructor (no requiere @Autowired en Spring moderno)
-    public CategoriaService(CategoriaRepository categoriaRepository) {
+    public CategoriaService(CategoriaRepository categoriaRepository, FirebaseStorageService firebaseStorageService) {
         this.categoriaRepository = categoriaRepository;
+        this.firebaseStorageService = firebaseStorageService;
     }
 
     @Transactional(readOnly = true)
@@ -26,17 +32,37 @@ public class CategoriaService {
     }
 
     @Transactional(readOnly = true)
-    public Categoria getCategoria(Integer idCategoria) {
-        return categoriaRepository.findById(idCategoria).orElse(new Categoria());
+    public Optional<Categoria> getCategoria(Integer idCategoria) {
+        return categoriaRepository.findById(idCategoria);
     }
 
     @Transactional
-    public void guardar(Categoria categoria) {
-        categoriaRepository.save(categoria);
+    public void save(Categoria categoria, MultipartFile imagenFile) {
+        categoria = categoriaRepository.save(categoria);
+        if (!imagenFile.isEmpty()) { //Si no esta vacio... pasaron una imagen...
+            try {
+                String rutaImagen = firebaseStorageService.uploadImage(
+                        imagenFile, "categoria", categoria.getIdCategoria());
+                categoria.setRutaImagen(rutaImagen);
+                categoriaRepository.save(categoria);
+            } catch (IOException e) {
+
+            }
+        }
     }
 
     @Transactional
-    public void eliminar(Integer idCategoria) {
-        categoriaRepository.deleteById(idCategoria);
+    public void delete(Integer idCategoria) {
+        // Verifica si la categoria existe antes de intentar eliminarlo
+        if (!categoriaRepository.existsById(idCategoria)) {
+            // Lanza una excepcion para indicar que el usuario no fue encontrado
+            throw new IllegalArgumentException("La categoria con ID " + idCategoria + " no existe.");
+        }
+        try {
+            categoriaRepository.deleteById(idCategoria);
+        } catch (DataIntegrityViolationException e) {
+            // Lanza una nueva excepcion para encapsular el problema de integridad de datos
+            throw new IllegalStateException("No se puede eliminar la categoria. Tiene datos asociados.", e);
+        }
     }
 }
