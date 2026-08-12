@@ -2,7 +2,7 @@ package pruebaTechShop.Armando.controller;
 
 import jakarta.validation.Valid;
 import java.util.Locale;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -50,13 +50,13 @@ public class ConstanteController {
         try {
             constanteService.delete(idConstante);
         } catch (IllegalArgumentException e) {
-            titulo = "error";
+            titulo = "error"; // Captura la excepcion de argumento invalido para el mensaje de "no existe"
             detalle = "constante.error01";
         } catch (IllegalStateException e) {
-            titulo = "error";
+            titulo = "error"; // Captura la excepcion de estado ilegal para el mensaje de "datos asociados"
             detalle = "constante.error02";
         } catch (Exception e) {
-            titulo = "error";
+            titulo = "error";  // Captura cualquier otra excepcion inesperada
             detalle = "constante.error03";
         }
         redirectAttributes.addFlashAttribute(titulo, messageSource.getMessage(detalle, null, Locale.getDefault()));
@@ -65,18 +65,13 @@ public class ConstanteController {
 
     @GetMapping("/modificar/{idConstante}")
     public String modificar(@PathVariable("idConstante") Integer idConstante, Model model, RedirectAttributes redirectAttributes) {
-        Optional<Constante> constanteOpt;
         try {
-            constanteOpt = Optional.of(constanteService.getConstante(idConstante));
-        } catch (Exception e) {
-            constanteOpt = Optional.empty();
-        }
-        if (constanteOpt.isEmpty()) {
+            model.addAttribute("constante", constanteService.getConstante(idConstante));
+            return "constante/modificar";
+        } catch (NoSuchElementException e) {
             redirectAttributes.addFlashAttribute("error", messageSource.getMessage("constante.error01", null, Locale.getDefault()));
             return "redirect:/constante/listado";
         }
-        model.addAttribute("constante", constanteOpt.get());
-        return "constante/modificar";
     }
 
     @PostMapping("/modificar")
