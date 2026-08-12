@@ -24,6 +24,35 @@ section {
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25) !important;
 }
 
+/* Semana 12: reglas para que la factura (carrito/verFactura) imprima limpia */
+@media print {
+    /* 1. La regla principal: fija la cabecera en cada pagina */
+    thead {
+        display: table-header-group;
+    }
+
+    /* 2. Regla de compatibilidad (opcional pero recomendada) */
+    tr {
+        page-break-inside: avoid;
+    }
+
+    /* 3. Asegura que la tabla no tenga margenes extranos que rompan el thead */
+    table {
+        margin: 0 !important;
+    }
+
+    /* Si esta usando Bootstrap/cards para la tabla, elimine los bordes */
+    .card, .card-body {
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Oculta elementos de navegacion, como se explico antes */
+    .d-print-none, .navbar, .footer {
+        display: none !important;
+    }
+}
+
 
 
 

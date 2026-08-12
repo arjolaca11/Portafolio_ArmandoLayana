@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <body>
+        <section th:fragment="asignar">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fa-solid fa-magnifying-glass"></i> [[#{accion.buscarUsuario}]]</h5>
+                </div>
+                <div class="card-body">
+                    <form method="GET" th:action="@{/usuario_rol/buscar}" th:object="${usuario}" class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label for="usernameInput" class="form-label">[[#{usuario.username}]]</label>
+                            <input type="text"
+                                   id="usernameInput"
+                                   name="username"
+                                   th:field="*{username}"
+                                   class="form-control"
+                                   required/>
+                        </div>
+                        <div class="col-md-auto">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa-solid fa-magnifying-glass"></i> [[#{accion.buscar}]]
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row" th:if="${usuario != null and usuario.idUsuario != null}">
+
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fa-solid fa-circle-user"></i> [[#{usuarioRol.perfil}]]</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img th:if="${usuario.rutaImagen}" th:src="${usuario.rutaImagen}"
+                                 alt="Imagen de Usuario"
+                                 class="img-fluid rounded-circle mb-3"
+                                 style="width: 150px; height: 150px; object-fit: cover;"/>
+                            <i th:unless="${usuario.rutaImagen}" class="fa-solid fa-circle-user mb-3" style="font-size: 150px; color: #ccc;"></i>
+
+                            <ul class="list-group list-group-flush text-start">
+                                <li class="list-group-item">
+                                    <strong>[[#{usuario.username}]]:</strong> [[${usuario.username}]]
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>[[#{usuario.nombre}]]:</strong> [[${usuario.nombre}]] [[${usuario.apellidos}]]
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>[[#{usuario.correo}]]:</strong> [[${usuario.correo}]]
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>[[#{usuario.telefono}]]:</strong> [[${usuario.telefono}]]
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0"><i class="fa-solid fa-circle-check"></i> [[#{usuarioRol.rolesUsuario}]]</h5>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li th:each="rolAsignado : ${rolesAsignados}" class="list-group-item d-flex justify-content-between align-items-center">
+                                [[${rolAsignado.rol}]]
+                                <form th:action="@{/usuario_rol/eliminar}" method="post" class="d-inline">
+                                    <input type="hidden" name="username" th:value="${usuario.username}"/>
+                                    <input type="hidden" name="idRol" th:value="${rolAsignado.idRol}"/>
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            </li>
+                            <li th:if="${#lists.isEmpty(rolesAsignados)}" class="list-group-item text-muted">
+                                [[#{usuarioRol.sinRoles}]]
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fa-solid fa-circle-plus"></i> [[#{usuarioRol.totalRoles}]]</h5>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li th:each="rolDisponible : ${rolesDisponibles}" class="list-group-item d-flex justify-content-between align-items-center">
+                                [[${rolDisponible}]]
+                                <form th:action="@{/usuario_rol/asignar}" method="post" class="d-inline">
+                                    <input type="hidden" name="username" th:value="${usuario.username}"/>
+                                    <input type="hidden" name="rol" th:value="${rolDisponible}"/>
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+                                </form>
+                            </li>
+                            <li th:if="${#lists.isEmpty(rolesDisponibles)}" class="list-group-item text-muted">
+                                [[#{usuarioRol.sinDisponibles}]]
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </body>
+</html>

@@ -47,7 +47,7 @@
                             </div>
                             <form th:action="@{/carrito/agregar}" method="post" class="d-inline">
                                 <input type="hidden" th:value="${p.idProducto}" name="idProducto"/>
-                                <button type="submit"
+                                <button type="button"
                                         class="btn btn-sm btn-primary"
                                         th:disabled="${p.existencias == 0}"
                                         onclick="addCart(this.form)">

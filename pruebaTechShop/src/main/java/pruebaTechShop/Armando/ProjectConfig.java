@@ -36,7 +36,7 @@ public class ProjectConfig implements WebMvcConfigurer {
         // "/acceso_denegado" no se registra aqui: lo maneja SecurityViewController porque
         // debe aceptar cualquier metodo HTTP (el AccessDeniedHandler hace un forward que
         // conserva el metodo original, incluyendo POST).
-        registry.addViewController("/registro/nuevo").setViewName("/registro/nuevo");
+        // "/registro/nuevo" y "/registro/activar" ya no se registran aqui: los maneja RegistroController
         registry.addViewController("/registro/recordar").setViewName("/registro/recordar");
     }
 

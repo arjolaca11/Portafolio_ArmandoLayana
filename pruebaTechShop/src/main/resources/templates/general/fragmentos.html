@@ -5,9 +5,11 @@
     <head th:fragment="head">
         <title>TechShop</title>
         <meta charset="UTF-8"/>
-        <!-- token CSRF de Spring Security; rutinas.js lo inyecta en todos los <form> de la pagina -->
+        <!-- token CSRF de Spring Security; rutinas.js lo inyecta en los <form> normales (_csrf_parameter)
+             y en el header de las peticiones AJAX como addCart (_csrf_header) -->
         <meta name="_csrf" th:content="${_csrf.token}"/>
         <meta name="_csrf_parameter" th:content="${_csrf.parameterName}"/>
+        <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
         <link th:href="@{/webjars/bootstrap/5.3.7/css/bootstrap.min.css}" rel="stylesheet"/>
         <link th:href="@{/webjars/font-awesome/7.0.0/css/all.css}" rel="stylesheet"/>
         <script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
@@ -38,12 +40,24 @@
                             <li class="nav-item px-2"><a class="nav-link" th:href="@{/producto/listado}">[[#{nav.productos}]]</a></li>
                             <li class="nav-item px-2"><a class="nav-link" th:href="@{/consultas/listado}">[[#{nav.consultas}]]</a></li>
                         </ul>
+                        <!-- solo visible para ADMIN: gestion de constantes y roles del sistema -->
+                        <ul class="navbar-nav" sec:authorize="hasRole('ADMIN')">
+                            <li class="nav-item dropdown px-2">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">[[#{nav.administracion}]]</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" th:href="@{/constante/listado}">[[#{nav.constantes}]]</a></li>
+                                    <li><a class="dropdown-item" th:href="@{/usuario_rol/mantenimiento}">[[#{nav.roles}]]</a></li>
+                                </ul>
+                            </li>
+                        </ul>
                         <ul class="navbar-nav">
                             <li class="nav-item px-2"><a class="nav-link" th:href="@{/ejemplo2}">[[#{nav.autos}]]</a></li>
                             <li class="nav-item px-2"><a class="nav-link" th:href="@{/multimedia}">[[#{nav.multimedia}]]</a></li>
                             <li class="nav-item px-2"><a class="nav-link" th:href="@{/iframes}">[[#{nav.iframes}]]</a></li>
                         </ul>
                         <div class="d-flex align-items-center">
+                            <!-- boton/badge del carrito; addCart() en rutinas.js reemplaza este contenido tras un agregar por AJAX -->
+                            <span id="resultBlock" class="me-2" th:insert="~{carrito/fragmentos :: verCarrito}"></span>
                             <!-- cada link manda ?lang=xx, lo captura localeChangeInterceptor en ProjectConfig.java -->
                             <ul class="navbar-nav">
                                 <li class="nav-item dropdown">

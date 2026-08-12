@@ -116,6 +116,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+		<!-- Envio de correos (activacion de cuenta en el registro) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
 		<!-- Permite usar sec:authorize / sec:authentication en las plantillas Thymeleaf -->
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>

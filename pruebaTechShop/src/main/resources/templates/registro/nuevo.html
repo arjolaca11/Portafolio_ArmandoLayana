@@ -4,12 +4,51 @@
     <body>
         <header th:replace="~{general/fragmentos :: header}"></header>
 
-        <div class="container text-center my-5">
-            <i class="fa-solid fa-user-plus fa-3x text-primary mb-3"></i>
-            <h2>[[#{accion.registrar}]]</h2>
-            <p>[[#{registro.proximamente}]]</p>
-            <a th:href="@{/login}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> [[#{login.login}]]</a>
+        <div class="row my-5">
+            <div class="col-md-6 offset-md-3">
+                <div class="card">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h2><i class="fa-solid fa-user-plus"></i> [[#{accion.registrar}]]</h2>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" th:action="@{/registro/guardar}" th:object="${usuario}" class="was-validated">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label>[[#{usuario.username}]]</label>
+                                    <input type="text" th:field="*{username}" class="form-control" maxlength="30" required="true"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>[[#{login.password}]]</label>
+                                    <input type="password" name="password" class="form-control" required="true"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>[[#{registro.nombre}]]</label>
+                                    <input type="text" th:field="*{nombre}" class="form-control" maxlength="20" required="true"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>[[#{registro.apellidos}]]</label>
+                                    <input type="text" th:field="*{apellidos}" class="form-control" maxlength="30" required="true"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>[[#{usuario.correo}]]</label>
+                                    <input type="email" th:field="*{correo}" class="form-control" maxlength="75" required="true"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>[[#{usuario.telefono}]]</label>
+                                    <input type="text" th:field="*{telefono}" class="form-control" maxlength="25"/>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-around mt-4">
+                                <a th:href="@{/login}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> [[#{login.login}]]</a>
+                                <button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> [[#{accion.registrar}]]</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <section th:replace="~{general/fragmentos :: mostrarToast}"></section>
 
         <footer th:replace="~{general/fragmentos :: footer}"></footer>
     </body>

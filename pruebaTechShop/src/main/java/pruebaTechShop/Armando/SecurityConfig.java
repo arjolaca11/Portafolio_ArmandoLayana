@@ -2,16 +2,14 @@ package pruebaTechShop.Armando;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+import pruebaTechShop.Armando.service.UsuarioDetailsService;
 
 @Configuration
 @EnableWebSecurity
@@ -25,7 +23,8 @@ public class SecurityConfig {
         "/login", "/acceso_denegado"
     };
 
-    // Rutas para usuarios con el rol USUARIO (reservado para el checkout del carrito, aun no implementado)
+    // Rutas que requieren estar autenticado (cualquier rol), pero no un rol especifico: el checkout
+    // del carrito. Vive fuera de "/carrito/**" (que es publico) para poder exigir login aqui.
     public static final String[] USUARIO_URLS = {
         "/facturar/carrito"
     };
@@ -35,16 +34,17 @@ public class SecurityConfig {
         "/producto/listado", "/categoria/listado"
     };
 
-    // Rutas exclusivas para el rol ADMIN (crear, modificar, eliminar)
+    // Rutas exclusivas para el rol ADMIN (crear, modificar, eliminar; gestion de constantes y roles)
     public static final String[] ADMIN_URLS = {
-        "/producto/**", "/categoria/**"
+        "/producto/**", "/categoria/**", "/constante/**", "/usuario_rol/**"
     };
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(request -> request
+    SecurityFilterChain securityFilterChain(HttpSecurity http, DaoAuthenticationProvider authenticationProvider) throws Exception {
+        http.authenticationProvider(authenticationProvider)
+                .authorizeHttpRequests(request -> request
                 .requestMatchers(PUBLIC_URLS).permitAll()
-                .requestMatchers(USUARIO_URLS).hasRole("USUARIO")
+                .requestMatchers(USUARIO_URLS).authenticated()
                 .requestMatchers(ADMIN_OR_VENDEDOR_URLS).hasAnyRole("ADMIN", "VENDEDOR")
                 .requestMatchers(ADMIN_URLS).hasRole("ADMIN")
                 .anyRequest().authenticated()
@@ -80,25 +80,12 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Usuarios en memoria, solo para fase de desarrollo.
-    // Este metodo sera reemplazado cuando se conecte a una base de datos.
+    // Autentica contra la tabla "usuario" (ver UsuarioDetailsService), reemplazando
+    // los usuarios en memoria de semana 9.
     @Bean
-    public UserDetailsService users(PasswordEncoder passwordEncoder) {
-        UserDetails juan = User.builder()
-                .username("juan")
-                .password(passwordEncoder.encode("123"))
-                .roles("ADMIN")
-                .build();
-        UserDetails rebeca = User.builder()
-                .username("rebeca")
-                .password(passwordEncoder.encode("456"))
-                .roles("VENDEDOR")
-                .build();
-        UserDetails pedro = User.builder()
-                .username("pedro")
-                .password(passwordEncoder.encode("789"))
-                .roles("USUARIO")
-                .build();
-        return new InMemoryUserDetailsManager(juan, rebeca, pedro);
+    public DaoAuthenticationProvider authenticationProvider(UsuarioDetailsService usuarioDetailsService, PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(usuarioDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
     }
 }
